@@ -1,0 +1,5 @@
+  async ngOnInit() {
+    if (await this.checkIfUserAuthenticated()) {
+      this.user = this.authInstance.currentUser.get();
+    }
+  }

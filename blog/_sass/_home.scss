@@ -1,0 +1,109 @@
+#me-img {
+    display: block;
+    margin: 0 auto;
+    border-radius: 50%;
+    width: 140px;
+    height: 140px;
+}
+
+.home aside .aside-block {
+    display: block;
+    text-align: center;
+    border: 1px solid $aside-border-color;
+    background-color: $code-alt-color2;
+    margin-bottom: 25px;
+    padding: 10px;
+    padding-bottom: 15px;
+
+    .title {
+        font-weight: bold;
+        padding-top: $spacing-unit / 6;
+        padding-bottom: $spacing-unit / 3;
+    }
+
+    .content {
+        text-align: justify;
+    }
+}
+
+.personal-info {
+    line-height: 23px;
+    font-size: 17px;
+}
+
+.pagination {
+    text-align: center;
+    padding: 5%;
+}
+
+/* Buttons */
+.aside-button {
+    cursor: pointer;
+    display: block;
+    width: 80%;
+    margin: 0 auto;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    border-radius: .25em;
+    height: 24px;
+    padding: 2px 5px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 24px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    border: 1px solid;
+    background-image: -moz-linear-gradient(top, #fafbfc, #eff3f6 90%);
+    background-image: linear-gradient(180deg, #fafbfc, #eff3f6 90%);
+    color: #24292e !important;
+    border-color: #cdcfd1 !important;
+    border-color: rgba(27, 31, 35, .2) !important;
+    background-color: #eff3f6;
+}
+
+.aside-button .icon {
+    width: 14px;
+    height: 14px;
+}
+
+.aside-button:hover {
+    text-decoration: none !important;
+    background-image: -moz-linear-gradient(top, #e1e1e2, #eff3f6 90%);
+    background-image: linear-gradient(180deg, #e1e1e2, #eff3f6 90%);
+}
+
+@media (max-width: 500px) {
+    #me-img {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 999px) {
+    .home aside .aside-block {
+        width: 75%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 1000px) {
+    .home {
+        display: flex;
+    }
+
+    .home main {
+        flex: 1;
+    }
+
+    .home aside {
+        flex: 0.4;
+        margin-bottom: 15px;
+        padding-left: 10px;
+        margin-left: 15px;
+        padding-right: 0px;
+    }
+}
