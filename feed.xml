@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-04-18T18:45:55+02:00</updated><id>/feed.xml</id><title type="html">jorgecf</title><entry><title type="html">Integrating Google authentication with your Angular app</title><link href="/2020/04/01/google-oauth-angular" rel="alternate" type="text/html" title="Integrating Google authentication with your Angular app" /><published>2020-04-01T23:33:29+02:00</published><updated>2020-04-01T23:33:29+02:00</updated><id>/2020/04/01/google-oauth-angular</id><content type="html" xml:base="/2020/04/01/google-oauth-angular">&lt;div class=&quot;excerpt&quot;&gt;
+    From the user point of view, the option to log in to a website with a Google account is convenient and
+    standardized. The Google OAuth API is the way to implement it and, while the library is developed in plain
+    JavaScript,
+    it can easily be integrated into your Angular application.
+&lt;/div&gt;
+&lt;!--endexcerpt--&gt;
+
+&lt;div class=&quot;article-content&quot;&gt;
+    &lt;div class=&quot;text-content&quot;&gt;
+        &lt;p&gt;
+            When you want to add some kind of authentication system to your Angular-powered web app, Google OAuth comes
+            in
+            handy because it simplifies all the identity verification process for the developer and makes it a
+            one-click well recognized action for your user.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+            The OAuth flow is a simple yet powerful one: the user clicks on a &quot;Sign in with Google&quot; button present at
+            your page and is prompted with a form to log into his Google account. When the log-in is done, the form
+            window
+            closes and gives you back the user data and a signed token. And that's all! You can use it to identify your
+            users.
+        &lt;/p&gt;
+
+        &lt;!-- Grab your keys --&gt;
+        &lt;section&gt;
+            &lt;div class=&quot;inter-title&quot;&gt;Grab your keys &lt;a id=&quot;grab-your-keys&quot; class=&quot;anchor&quot;&gt;#&lt;/a&gt;&lt;/div&gt;
+            &lt;p&gt;
+                First things first, you have to create a project through the Google API
+                Console to which all log-ins will be associated. Refer to Google &lt;a
+                    href=&quot;https://developers.google.com/identity/sign-in/web/sign-in&quot; target=&quot;_blank&quot;
+                    rel=&quot;noreferrer noopener&quot;&gt;for
+                    the creation steps.&lt;/a&gt;
+
+                Once created, under the Credentials options, you need to set up an &quot;OAuth 2.0 Client&quot;. This will create
+                a
+                Client ID (our key) for you.
+
+                &lt;img src=&quot;/assets/images/oauth_4.png&quot; alt=&quot;client id key&quot; /&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                An explicit authorization has to be added for every URL under which the app is going to be stored. For
+                testing
+                purposes,
+                whitelisting your
+                local development site should be sufficient.
+
+                &lt;img src=&quot;/assets/images/oauth_5.png&quot; alt=&quot;whitelisted origins&quot; /&gt;
+
+                With this credentials, now your app is allowed to communicate to Google.
+            &lt;/p&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Get your app ready --&gt;
+        &lt;section&gt;
+            &lt;div class=&quot;inter-title&quot;&gt;Get your app ready &lt;a id=&quot;get-your-app-ready&quot; class=&quot;anchor&quot;&gt;#&lt;/a&gt;&lt;/div&gt;
+            &lt;p&gt;
+                The SDK is developed in plain JavaScript, so in order to make our compiler happy, we have to install
+                the Typescript types provided by the &lt;a href=&quot;https://github.com/DefinitelyTyped/DefinitelyTyped&quot;
+                    target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;DefinitelyTyped project&lt;/a&gt;. Open up a
+                terminal and
+                install
+                them via npm:
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;nx&quot;&gt;npm&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;save&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;types&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/gapi.auth2&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                By default, you should have the types loaded, since your TS compiler usually looks for them
+                under
+                the &lt;span class=&quot;monotype&quot;&gt;node_modules/@types&lt;/span&gt; folder, where this
+                particular package is installed. If it's not the case, you can assert
+                it filling the types array:
+
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;compilerOptions&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;types&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;gapi.auth2&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+                &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;tsconfig.json&lt;/span&gt;&lt;/div&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                And a script tag should be placed at your index. This will load the external code.
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;defer&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://apis.google.com/js/api.js&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+                &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;index.html&lt;/span&gt;&lt;/div&gt;
+            &lt;/p&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Place a button --&gt;
+        &lt;section&gt;
+            &lt;div class=&quot;inter-title&quot;&gt;Place a button &lt;a id=&quot;place-a-button&quot; class=&quot;anchor&quot;&gt;#&lt;/a&gt;&lt;/div&gt;
+            &lt;p&gt;
+                I'm going to use a simple button for the user to log-in. When this button is clicked, a prompt will ask
+                the
+                user to grant permission to your application. Whether they complete the form or abandon it, we'll catch
+                the
+                result.
+
+                &lt;img src=&quot;/assets/images/oauth_2.png&quot; alt=&quot;oauth form&quot; /&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                Create a component:
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-js&quot; data-lang=&quot;js&quot;&gt;&lt;span class=&quot;nx&quot;&gt;ng&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;generate&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;component&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;auth&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;button&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                And give it a click handler:
+
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;button&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;(click)=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;authenticate()&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Authenticate&lt;span class=&quot;nt&quot;&gt;&amp;lt;/button&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+                &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;auth-button.component.html&lt;/span&gt;&lt;/div&gt;
+
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                Now, you're ready to add the logic behind it.
+            &lt;/p&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Make some promises --&gt;
+        &lt;section&gt;
+            &lt;div class=&quot;inter-title&quot;&gt;Make some promises &lt;a id=&quot;make-some-promises&quot; class=&quot;anchor&quot;&gt;#&lt;/a&gt;&lt;/div&gt;
+            &lt;p&gt;
+                Talking to a server is an inherently asynchronous operation.
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                The gapi relies heavily in callbacks in a way I don't feel really comfortable with, so
+                my
+                personal approach here is wrapping the functions in Promises so they can be called in a more functional
+                way.
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                For the set up, you will have to load the auth2 library and initialize it with your app key. I wrote
+                this
+                function to be called in a &quot;lazy&quot; way, that means, it's not to be called until authentication happens
+                for
+                the first time.
+
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ts&quot; data-lang=&quot;ts&quot;&gt;  &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;initGoogleAuth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Promise&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//  Create a new Promise where the resolve &lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// function is the callback passed to gapi.load&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pload&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Promise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;resolve&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;nx&quot;&gt;gapi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;load&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;auth2&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;resolve&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// When the first promise resolves, it means we have gapi&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// loaded and that we can call gapi.init&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;pload&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;gapi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;auth2&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;client_id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;YOUR_GOOGLE_KEY&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;auth&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;gapiSetup&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+          &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;authInstance&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;auth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+                &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;auth-button.component.ts&lt;/span&gt;&lt;/div&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                The second one is the actual authentication method we previously set as the click handler. We
+                await for the prompt result and catch the result with the data or the error.
+
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ts&quot; data-lang=&quot;ts&quot;&gt;  &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;authenticate&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Promise&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;gapi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;auth2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;GoogleUser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Initialize gapi if not done yet&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;gapiSetup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;initGoogleAuth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;// Resolve or reject signin Promise&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Promise&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;authInstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;signIn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;user&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;nx&quot;&gt;error&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;error&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+                &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;auth-button.component.ts&lt;/span&gt;&lt;/div&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                This would work already, but if you want to keep your user logged in when they come back, you can check
+                if
+                there's one currently stored on your ngOnInit and use it:
+
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ts&quot; data-lang=&quot;ts&quot;&gt;  &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;checkIfUserAuthenticated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;():&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Promise&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;boolean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;// Initialize gapi if not done yet&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;gapiSetup&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;initGoogleAuth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;authInstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;isSignedIn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+                &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;auth-button.component.ts&lt;/span&gt;&lt;/div&gt;
+
+                &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ts&quot; data-lang=&quot;ts&quot;&gt;  &lt;span class=&quot;k&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ngOnInit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;await&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;checkIfUserAuthenticated&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+      &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;user&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;authInstance&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;currentUser&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+                &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;auth-button.component.ts&lt;/span&gt;&lt;/div&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                After that, the local variable user is filled with the user data, including a unique ID, and can be sent
+                to your server
+                to be stored.
+            &lt;/p&gt;
+        &lt;/section&gt;
+
+        &lt;!-- Talk to the server --&gt;
+        &lt;section&gt;
+            &lt;div class=&quot;inter-title&quot;&gt;Talk to the server &lt;a id=&quot;talk-to-the-server&quot; class=&quot;anchor&quot;&gt;#&lt;/a&gt;&lt;/div&gt;
+            &lt;p&gt;
+                Now that you have a way to identify each one of your users uniquely and unequivocally, the
+                logical
+                step forward is to send this info to your backend. Usually, you'd want to store the unique ID in your
+                database system of choice.
+
+            &lt;/p&gt;
+            &lt;p&gt;
+                It's not a secret that sending this ID plainly to your backend would raise a huge security issue: you
+                have to consider &lt;strong&gt;everything&lt;/strong&gt; that comes from your client &lt;em&gt;insecure by default&lt;/em&gt;.
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                When the user logs in to your site through Google OAuth, the api gives you not only the personal data
+                for
+                the user but a token as well. Simply speaking, this token is generated and signed at Google's side and
+                it
+                states for
+                whom user is valid and to which app, until when is valid amongst some other data. This token is what
+                you
+                will
+                send
+                to your server, and its validation is the way to make sure your application does not get compromised.
+                Google
+                provides &lt;a
+                    href=&quot;https://developers.google.com/identity/sign-in/web/backend-auth#verify-the-integrity-of-the-id-token&quot;
+                    target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;the steps needed to validate one of its tokens.&lt;/a&gt;
+            &lt;/p&gt;
+
+            &lt;p&gt;
+                Furthermore, they have already built-in libraries to do the dirty work in some languages. For example,
+                for
+                .NET a
+                &lt;span class=&quot;monotype&quot;&gt;GoogleJsonWebSignature.ValidateAsync&lt;/span&gt; method is provided. If you &lt;a
+                    href=&quot;https://github.com/googleapis/google-api-dotnet-client/blob/master/Src/Support/Google.Apis.Auth/GoogleJsonWebSignature.cs&quot;
+                    target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;inspect the code&lt;/a&gt;, you will see how every step is
+                implemented.
+
+            &lt;/p&gt;
+        &lt;/section&gt;
+
+        &lt;section&gt;
+            &lt;div class=&quot;inter-title&quot;&gt;Final thoughts &lt;a id=&quot;final-thoughts&quot; class=&quot;anchor&quot;&gt;#&lt;/a&gt;&lt;/div&gt;
+            &lt;p&gt;
+                I hope you found this little covering interesting.
+                You can check the working example &lt;a href=&quot;https://github.com/jorgecf/google-oauth-angular&quot; target=&quot;_blank&quot;
+                    rel=&quot;noreferrer noopener&quot;&gt;in my
+                    GitHub.&lt;/a&gt;
+            &lt;/p&gt;
+        &lt;/section&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;</content><author><name>Jorge Cifuentes</name></author><summary type="html">From the user point of view, the option to log in to a website with a Google account is convenient and standardized. The Google OAuth API is the way to implement it and, while the library is developed in plain JavaScript, it can easily be integrated into your Angular application.</summary></entry></feed>

@@ -1,8 +1,0 @@
-  async checkIfUserAuthenticated(): Promise<boolean> {
-    // Initialize gapi if not done yet
-    if (!this.gapiSetup) {
-      await this.initGoogleAuth();
-    }
-
-    return this.authInstance.isSignedIn.get();
-  }
