@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>/2020/04/01/google-oauth-angular</loc>
-<lastmod>2020-04-01T23:33:29+02:00</lastmod>
+<loc>/2020/04/18/google-oauth-angular</loc>
+<lastmod>2020-04-18T18:00:00+02:00</lastmod>
 </url>
 <url>
 <loc>/about/</loc>
@@ -26,6 +26,6 @@
 <loc>/2020/04/</loc>
 </url>
 <url>
-<loc>/2020/04/01/</loc>
+<loc>/2020/04/18/</loc>
 </url>
 </urlset>
