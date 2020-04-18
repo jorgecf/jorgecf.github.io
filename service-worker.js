@@ -1,10 +1,15 @@
 var APP_PREFIX = 'jorgecfgithubio';
-var VERSION = 'v1';
+var VERSION = 'v1.1';
 var CACHE_NAME = APP_PREFIX + VERSION;
 var URLS = [
+    '/',
     '/index.html',
     '/about/index.html',
+    '/about',
+    '/about/',
     '/archive/index.html',
+    '/archive',
+    '/archive/',
     '/assets/js/dark-theme.js',
     '/assets/js/offline.js',
     '/assets/fonts/LibreBaskerville-Bold.ttf',
@@ -28,14 +33,23 @@ var URLS = [
     '/assets/fonts/Roboto-ThinItalic.ttf',
     'assets/images/me.JPG',
     'assets/images/sunset.jpg',
-    'assets/main.css'
+    'assets/images/GitHub-Mark-32px.png',
+    'assets/images/32px-Generic_Feed-icon.png',
+    'assets/main.css',
+    'assets/images/oauth_2.png',
+    'assets/images/oauth_3.png',
+    'assets/images/oauth_4.png',
+    'assets/images/oauth_5.png',
+    'site.webmanifest',
+    'favicon-32x32.png',
+    'favicon-16x16.png',
+    '2020/04/01/google-oauth-angular'
 ]
 
 // Cache resources
 self.addEventListener('install', function (e) {
     e.waitUntil(
         caches.open(CACHE_NAME).then(function (cache) {
-            console.log('installing cache : ' + CACHE_NAME)
             return cache.addAll(URLS);
         })
     )
@@ -43,22 +57,9 @@ self.addEventListener('install', function (e) {
 
 // Respond with cached resources
 self.addEventListener('fetch', function (event) {
-    console.log('fetch request : ' + event.request.url)
-
     event.respondWith(
         caches.match(event.request).then(function (request) {
-            // if cache is available, respond with cache
-            if (request) {
-                console.log('responding with cache : ' + event.request.url);
-                return request;
-            }
-            // if there are no cache, try fetching request
-            else {
-                console.log('file is not cached, fetching : ' + event.request.url);
-                return fetch(event.request);
-            }
-
-            // return request || fetch(e.request)
+            return request || fetch(event.request);
         })
     )
 })
@@ -72,8 +73,7 @@ self.addEventListener('activate', function (e) {
 
             return Promise.all(keyList.map(function (key, i) {
                 if (cacheWhitelist.indexOf(key) === -1) {
-                    console.log('deleting cache : ' + keyList[i])
-                    return caches.delete(keyList[i])
+                    return caches.delete(keyList[i]);
                 }
             }))
         })
