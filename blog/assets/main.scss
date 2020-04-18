@@ -6,9 +6,9 @@
 @import "theme";
 
 .light-body {
-    @import "theme.light";
+    @import "../_sass/theme.light";
 }
 
 .dark-body {
-    @import "theme.dark";
+    @import "../_sass/theme.dark";
 }
