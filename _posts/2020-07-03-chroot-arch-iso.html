@@ -1,0 +1,64 @@
+---
+layout: post
+title: "Logging into your Archlinux installation through a bootable USB"
+date: 2020-07-03 20:00:00 +0200
+categories: archlinux linux
+author: Jorge Cifuentes
+---
+
+<div class="excerpt">
+    Simply put, I messed up installing Archlinux and my system didn't have internet so I couldn't do anything. This is the way I solved it.
+</div>
+<!--endexcerpt-->
+
+<div class="article-content">
+    <div class="text-content">
+        <p>
+            For once in a long time, I had some trouble setting up WiFi and Ethernet in my Archlinux installation. After finishing and rebooting to the actual system, I couldn't get up dhcp, and neither wifi-menu (netctl) nor network-manager were installed so I didn't have any means to connect to the web and install needed packages. What a vicious circle.
+        </p>
+
+        <p>
+           What I had to do was quite simple really: grab again the bootable USB that I used to install the system in the first place, boot it into the installer and then mount my partitions. These are the partitions I created in the installation process, in my case root and home:
+           
+            <div class="code-caption"><span>mount /dev/sda1 /mnt</span></div>
+           
+            <div class="code-caption"><span>mount /dev/sda2 /mnt/home</span></div>
+           
+           Then, chroot into it:
+           
+            <div class="code-caption"><span>arch-chroot /mnt</span></div>
+           
+           Now, you're inside your system as root. In my case, I used iwctl to connect to my WiFi (I used to use wifi-menu, I swear it came in the iso, but it didn't this time). Run "ip a" and get the name of your wireless interface, and connect to your wifi:
+           
+            <div class="code-caption"><span>station wlp01 scan</span></div>
+            <div class="code-caption"><span>station wlp01 get-networks</span></div>
+            <div class="code-caption"><span>station wlp01 connect YOUR_WIFI_SSID</span></div>
+           
+           And you'll be prompted to enter the password. After that I rebooted into my actual system, and I was already able to download packages, so I just downloaded networkmanager from pacman. And that's all, having an internet connection I could install everything I needed:
+           
+           <pre>
+                  .o+`                 jorge@jorge
+                 `ooo/                 OS: Arch Linux 
+                `+oooo:                Kernel: x86_64 Linux 5.7.7-arch1-1
+               `+oooooo:               Uptime: 55m
+               -+oooooo+:              Packages: 663
+             `/:-:++oooo+:             Shell: zsh 5.8
+            `/++++/+++++++:            Resolution: 1920x1080
+           `/++++++++++++++:           DE: KDE 5.71.0 / Plasma 5.19.2
+          `/+++ooooooooooooo/`         WM: KWin
+         ./ooosssso++osssssso+`        GTK Theme: Breeze [GTK2/3]
+        .oossssso-````/ossssss+`       Icon Theme: breeze
+       -osssssso.      :ssssssso.      Disk: 6.0G / 190G (4%)
+      :osssssss/        osssso+++.     CPU: Intel Core i5-4210H @ 4x 3.5GHz [55.0°C]
+     /ossssssss/        +ssssooo/-     RAM: 2247MiB / 3853MiB
+   `/ossssso+/:-        -:/+osssso+-   
+  `+sso+:-`                 `.-/+oso: 
+ `++:.                           `-/+/
+ .`                                 `/
+
+ </pre>
+        </p>
+
+    </div>
+
+</div>
