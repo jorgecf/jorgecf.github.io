@@ -1,4 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.0">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-04-18T18:50:51+02:00</updated><id>/feed.xml</id><title type="html">jorgecf</title><entry><title type="html">Integrating Google authentication with your Angular app</title><link href="/2020/04/18/google-oauth-angular" rel="alternate" type="text/html" title="Integrating Google authentication with your Angular app" /><published>2020-04-18T18:00:00+02:00</published><updated>2020-04-18T18:00:00+02:00</updated><id>/2020/04/18/google-oauth-angular</id><content type="html" xml:base="/2020/04/18/google-oauth-angular">&lt;div class=&quot;excerpt&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-07-03T20:38:17+02:00</updated><id>/feed.xml</id><title type="html">jorgecf</title><entry><title type="html">Logging into your Archlinux installation through a bootable USB</title><link href="/2020/07/03/chroot-arch-iso" rel="alternate" type="text/html" title="Logging into your Archlinux installation through a bootable USB" /><published>2020-07-03T20:00:00+02:00</published><updated>2020-07-03T20:00:00+02:00</updated><id>/2020/07/03/chroot-arch-iso</id><content type="html" xml:base="/2020/07/03/chroot-arch-iso">&lt;div class=&quot;excerpt&quot;&gt;
+    Simply put, I messed up installing Archlinux and my system didn't have internet so I couldn't do anything. This is the way I solved it.
+&lt;/div&gt;
+&lt;!--endexcerpt--&gt;
+
+&lt;div class=&quot;article-content&quot;&gt;
+    &lt;div class=&quot;text-content&quot;&gt;
+        &lt;p&gt;
+            For once in a long time, I had some trouble setting up WiFi and Ethernet in my Archlinux installation. After finishing and rebooting to the actual system, I couldn't get up dhcp, and neither wifi-menu (netctl) nor network-manager were installed so I didn't have any means to connect to the web and install needed packages. What a vicious circle.
+        &lt;/p&gt;
+
+        &lt;p&gt;
+           What I had to do was quite simple really: grab again the bootable USB that I used to install the system in the first place, boot it into the installer and then mount my partitions. These are the partitions I created in the installation process, in my case root and home:
+           
+            &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;mount /dev/sda1 /mnt&lt;/span&gt;&lt;/div&gt;
+           
+            &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;mount /dev/sda2 /mnt/home&lt;/span&gt;&lt;/div&gt;
+           
+           Then, chroot into it:
+           
+            &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;arch-chroot /mnt&lt;/span&gt;&lt;/div&gt;
+           
+           Now, you're inside your system as root. In my case, I used iwctl to connect to my WiFi (I used to use wifi-menu, I swear it came in the iso, but it didn't this time). Run &quot;ip a&quot; and get the name of your wireless interface, and connect to your wifi:
+           
+            &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;station wlp01 scan&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;station wlp01 get-networks&lt;/span&gt;&lt;/div&gt;
+            &lt;div class=&quot;code-caption&quot;&gt;&lt;span&gt;station wlp01 connect YOUR_WIFI_SSID&lt;/span&gt;&lt;/div&gt;
+           
+           And you'll be prompted to enter the password. After that I rebooted into my actual system, and I was already able to download packages, so I just downloaded networkmanager from pacman. And that's all, having an internet connection I could install everything I needed:
+           
+           &lt;pre&gt;
+                  .o+`                 jorge@jorge
+                 `ooo/                 OS: Arch Linux 
+                `+oooo:                Kernel: x86_64 Linux 5.7.7-arch1-1
+               `+oooooo:               Uptime: 55m
+               -+oooooo+:              Packages: 663
+             `/:-:++oooo+:             Shell: zsh 5.8
+            `/++++/+++++++:            Resolution: 1920x1080
+           `/++++++++++++++:           DE: KDE 5.71.0 / Plasma 5.19.2
+          `/+++ooooooooooooo/`         WM: KWin
+         ./ooosssso++osssssso+`        GTK Theme: Breeze [GTK2/3]
+        .oossssso-````/ossssss+`       Icon Theme: breeze
+       -osssssso.      :ssssssso.      Disk: 6.0G / 190G (4%)
+      :osssssss/        osssso+++.     CPU: Intel Core i5-4210H @ 4x 3.5GHz [55.0°C]
+     /ossssssss/        +ssssooo/-     RAM: 2247MiB / 3853MiB
+   `/ossssso+/:-        -:/+osssso+-   
+  `+sso+:-`                 `.-/+oso: 
+ `++:.                           `-/+/
+ .`                                 `/
+
+ &lt;/pre&gt;
+        &lt;/p&gt;
+
+    &lt;/div&gt;
+
+&lt;/div&gt;</content><author><name>Jorge Cifuentes</name></author><category term="archlinux" /><category term="linux" /><summary type="html">Simply put, I messed up installing Archlinux and my system didn't have internet so I couldn't do anything. This is the way I solved it.</summary></entry><entry><title type="html">Integrating Google authentication with your Angular app</title><link href="/2020/04/18/google-oauth-angular" rel="alternate" type="text/html" title="Integrating Google authentication with your Angular app" /><published>2020-04-18T18:00:00+02:00</published><updated>2020-04-18T18:00:00+02:00</updated><id>/2020/04/18/google-oauth-angular</id><content type="html" xml:base="/2020/04/18/google-oauth-angular">&lt;div class=&quot;excerpt&quot;&gt;
     From the user point of view, the option to log in to a website with a Google account is convenient and
     standardized. The Google OAuth API is the way to implement it and, while the library is developed in plain
     JavaScript,
@@ -263,4 +318,4 @@
 
     &lt;/div&gt;
 
-&lt;/div&gt;</content><author><name>Jorge Cifuentes</name></author><summary type="html">From the user point of view, the option to log in to a website with a Google account is convenient and standardized. The Google OAuth API is the way to implement it and, while the library is developed in plain JavaScript, it can easily be integrated into your Angular application.</summary></entry></feed>
+&lt;/div&gt;</content><author><name>Jorge Cifuentes</name></author><category term="angular" /><category term="oauth" /><summary type="html">From the user point of view, the option to log in to a website with a Google account is convenient and standardized. The Google OAuth API is the way to implement it and, while the library is developed in plain JavaScript, it can easily be integrated into your Angular application.</summary></entry></feed>
