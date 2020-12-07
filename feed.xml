@@ -1,4 +1,171 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-07-03T20:38:17+02:00</updated><id>/feed.xml</id><title type="html">jorgecf</title><entry><title type="html">Logging into your Archlinux installation through a bootable USB</title><link href="/2020/07/03/chroot-arch-iso" rel="alternate" type="text/html" title="Logging into your Archlinux installation through a bootable USB" /><published>2020-07-03T20:00:00+02:00</published><updated>2020-07-03T20:00:00+02:00</updated><id>/2020/07/03/chroot-arch-iso</id><content type="html" xml:base="/2020/07/03/chroot-arch-iso">&lt;div class=&quot;excerpt&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.0.1">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2020-12-07T01:56:32+01:00</updated><id>/feed.xml</id><title type="html">jorgecf</title><entry><title type="html">A straightforward introduction to Dependency Injection</title><link href="/2020/12/07/dependency-injection" rel="alternate" type="text/html" title="A straightforward introduction to Dependency Injection" /><published>2020-12-07T00:00:00+01:00</published><updated>2020-12-07T00:00:00+01:00</updated><id>/2020/12/07/dependency-injection</id><content type="html" xml:base="/2020/12/07/dependency-injection">&lt;p&gt;This post presents a concise and short introduction to the technique called Dependency Injection (DI).&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-task&quot;&gt;The task&lt;/h2&gt;
+&lt;p&gt;Let’s say you have a database with user-related data and that you want to query some of this data to process it. You might start with a class looking like this, using a &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt; class:&lt;/p&gt;
+
+&lt;div class=&quot;language-cs highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Foo&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;SqlReader&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nf&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;dataReader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SqlReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Process&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;QueryById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// process the data&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;        
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-problem&quot;&gt;The problem&lt;/h2&gt;
+&lt;p&gt;Imagine that your software expands and, when running in a new  mode, it should not get the data from a database but from some CSV files.&lt;/p&gt;
+
+&lt;p&gt;The main obstacle here is that our &lt;code class=&quot;highlighter-rouge&quot;&gt;Foo&lt;/code&gt; class is coupled with the &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt;: you can see it in the fact that a &lt;strong&gt;new&lt;/strong&gt; instance is created in the constructor. In short words, it depends on an implementation: &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt; is a &lt;strong&gt;dependency&lt;/strong&gt; of &lt;code class=&quot;highlighter-rouge&quot;&gt;Foo&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;One could add this CSV functionality to the &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt; class (ugly) or make &lt;code class=&quot;highlighter-rouge&quot;&gt;CsvReader&lt;/code&gt; expand &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt; (would get messy when adding even new more readers). This is a perfect use case for &lt;strong&gt;inversion of control&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;the-inversion-of-control&quot;&gt;The inversion of control&lt;/h2&gt;
+
+&lt;h3 id=&quot;theory&quot;&gt;Theory&lt;/h3&gt;
+&lt;p&gt;Here is where the concept &lt;strong&gt;Dependency Inversion&lt;/strong&gt; gets to shine. Simply speaking, it means that the control of any class dependencies should be inverted: the &lt;code class=&quot;highlighter-rouge&quot;&gt;Foo&lt;/code&gt; class shouldn’t be the one instantiating a &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;This can be accomplished with the technique called &lt;strong&gt;Dependency Injection&lt;/strong&gt;: it applies the principle that ensures classes are never responsible of supplying their own dependencies (they get &lt;em&gt;injected&lt;/em&gt;).&lt;/p&gt;
+
+&lt;p&gt;And why is it important? It helps you decouple your application: you have the implemented code in one side, and the code that uses it in the other, both depending on a &lt;strong&gt;common interface&lt;/strong&gt;. You can change them separately as long as it fits the interface, thanks to the concerns being separated.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+  &lt;img src=&quot;/assets/images/di.png&quot; /&gt;
+&lt;/p&gt;
+
+&lt;h3 id=&quot;the-code&quot;&gt;The code&lt;/h3&gt;
+&lt;p&gt;Usually, you would start by creating an interface &lt;code class=&quot;highlighter-rouge&quot;&gt;IReader&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-cs highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;IReader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;QueryById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and implement it for every reader you wanted:&lt;/p&gt;
+
+&lt;div class=&quot;language-cs highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SqlReader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IReader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;QueryById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-cs highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CsvReader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IReader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;QueryById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;id&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;interfaces-nothing-new&quot;&gt;Interfaces? Nothing new&lt;/h3&gt;
+
+&lt;p&gt;You probably already knew about interfaces and, at the end of the day, an object based on one has to be instantiated with a concrete implementation. So how is it better if you’re going to end up doing this?:&lt;/p&gt;
+
+&lt;div class=&quot;language-cs highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Foo&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;IReader&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nf&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;SqlReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// &amp;lt;--- coupling&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Process&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;QueryById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// process the data&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;       
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;
+This is where the &lt;strong&gt;dependency inversion container&lt;/strong&gt; plays its part: somewhere in your code, you still need to instantiate the implementation of the interface. The container is the one actually instantiating your objects and supplying them, so your code will look like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-cs highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Foo&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;IReader&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;dataReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nf&quot;&gt;constructor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IReader&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// &amp;lt;--- this is called by the container&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// &amp;lt;--- injection&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;double&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;Process&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;QueryById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// process the data&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;       
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;
+The container is a fairly complicated software that tracks and manages how interfaces are implemented. You could simplify them in your mind as a dictionary of interfaces mapped to implementing classes. Some examples of these containers are Autofac or Ninject.&lt;/p&gt;
+
+&lt;p&gt;With Autofac you can do something in the lines of this to have multiple implementations depending on some runtime variable:&lt;/p&gt;
+
+&lt;div class=&quot;language-cs highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;someCondition&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RegisterType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SqlReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;As&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;builder&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;RegisterType&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CsvReader&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;&amp;gt;().&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AsIReader&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;&amp;gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;
+The magic thing about containers, as opposed to wiring the dependencies yourself, is that you don’t have to worry about calling the constructor with &lt;code class=&quot;highlighter-rouge&quot;&gt;new SqlReader()&lt;/code&gt;. This is very useful with a lot of interfaces where the dependency chain is deeply nested. &lt;strong&gt;You just tell the container what implementation you want to use&lt;/strong&gt; and let it inject it using the constructor in whatever number of classes you might have.&lt;/p&gt;
+
+&lt;p&gt;After these changes, total decoupling is achieved. &lt;code class=&quot;highlighter-rouge&quot;&gt;Foo&lt;/code&gt; doesn’t have to know any details of &lt;code class=&quot;highlighter-rouge&quot;&gt;IReader&lt;/code&gt; or even how its instantiated: &lt;strong&gt;it just gets injected&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;Note that containers usually can inject dependencies via the constructor, or a property or field.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;so-what-is-it-useful-for&quot;&gt;So what is it useful for?&lt;/h3&gt;
+
+&lt;h4 id=&quot;extensibility-and-reusability&quot;&gt;Extensibility and reusability&lt;/h4&gt;
+
+&lt;p&gt;The first thing to note is that given your code is based on abstracts, extending it’s as easy as implementing new classes and telling the container under which circumstances they should be used. The same code using &lt;code class=&quot;highlighter-rouge&quot;&gt;IReader&lt;/code&gt; can work with a &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;CsvReader&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;JsonReader&lt;/code&gt; or any other implementation. You can change and switch these classes without having to change the code that uses them.&lt;/p&gt;
+
+&lt;h4 id=&quot;unit-testing&quot;&gt;Unit testing&lt;/h4&gt;
+
+&lt;p&gt;If you wanted to test the &lt;code class=&quot;highlighter-rouge&quot;&gt;Foo.Process&lt;/code&gt; method, hitting your database when running tests would be, most of the time, an anti-pattern and slow.&lt;/p&gt;
+
+&lt;p&gt;But, since Foo depends on the interface &lt;code class=&quot;highlighter-rouge&quot;&gt;IReader&lt;/code&gt;, you can resolve this interface to &lt;code class=&quot;highlighter-rouge&quot;&gt;SqlReader&lt;/code&gt; in normal execution and &lt;code class=&quot;highlighter-rouge&quot;&gt;FakeDataReader&lt;/code&gt; while running tests. The &lt;code class=&quot;highlighter-rouge&quot;&gt;FakeDataReader&lt;/code&gt; would just fake the database using in-memory variables. That would mean faster tests and in a more controlled and reproducible environment.&lt;/p&gt;
+
+&lt;h4 id=&quot;safer-parallel-programming&quot;&gt;Safer parallel programming&lt;/h4&gt;
+
+&lt;p&gt;Two developers can work with classes that use each other only based on the interface, without having to modify the other developer files. Less git conflicts 😃.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;the-cons&quot;&gt;The cons&lt;/h3&gt;
+
+&lt;p&gt;Obviously, the main adverse effect is the added layer of &lt;strong&gt;indirection&lt;/strong&gt;. This makes the software a bit harder to understand - your implemented classes won’t be directly referenced where they will be used. You won’t be able to find references or easily trace them, and you won’t know which implementation is injected until you debug it.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;wrap-up&quot;&gt;Wrap-up&lt;/h3&gt;
+&lt;p&gt;To summarize, dependency injection is a technique used to satisfy the &lt;strong&gt;dependency inversion principle&lt;/strong&gt;, introducing interfaces between a high-level class and its dependencies and making their relation loosely coupled assuring that the only central point where an interface is related to its actual implementation is in the container code.&lt;/p&gt;
+
+&lt;p&gt;The three steps to achieve this would be:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Get your high-level class dependencies injected via the constructor (&lt;em&gt;dependency injection&lt;/em&gt;).&lt;/li&gt;
+  &lt;li&gt;Make this dependencies implement a common interface (&lt;em&gt;decoupling&lt;/em&gt;).&lt;/li&gt;
+  &lt;li&gt;Leave the hassle of calling all the injecting constructors to a dependency inversion container.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;As a sidenote, using interfaces isn’t inherent to dependency injection: you can have dependencies marked as a normal class and have them injected, but DI works better with interfaces.&lt;/p&gt;
+
+&lt;p&gt;At the end of the day, using this technique is a development decision up the creator. Any questions?&lt;/p&gt;</content><author><name>Jorge Cifuentes</name></author><category term="inversion" /><category term="patterns" /><summary type="html">This post presents a concise and short introduction to the technique called Dependency Injection (DI).</summary></entry><entry><title type="html">Logging into your Archlinux installation through a bootable USB</title><link href="/2020/07/03/chroot-arch-iso" rel="alternate" type="text/html" title="Logging into your Archlinux installation through a bootable USB" /><published>2020-07-03T20:00:00+02:00</published><updated>2020-07-03T20:00:00+02:00</updated><id>/2020/07/03/chroot-arch-iso</id><content type="html" xml:base="/2020/07/03/chroot-arch-iso">&lt;div class=&quot;excerpt&quot;&gt;
     Simply put, I messed up installing Archlinux and my system didn't have internet so I couldn't do anything. This is the way I solved it.
 &lt;/div&gt;
 &lt;!--endexcerpt--&gt;

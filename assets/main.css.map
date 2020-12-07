@@ -3,13 +3,13 @@
 	"file": "main.css",
 	"sources": [
 		"main.scss",
-		"_sass/_fonts.scss",
-		"_sass/theme.scss",
-		"_sass/_base.scss",
-		"_sass/_page.scss",
-		"_sass/_layout.scss",
-		"_sass/_home.scss",
-		"_sass/_syntax-highlighting.scss"
+		"../../Código/jorgecf.github.io/_sass/_fonts.scss",
+		"../../Código/jorgecf.github.io/_sass/theme.scss",
+		"../../Código/jorgecf.github.io/_sass/_base.scss",
+		"../../Código/jorgecf.github.io/_sass/_page.scss",
+		"../../Código/jorgecf.github.io/_sass/_layout.scss",
+		"../../Código/jorgecf.github.io/_sass/_home.scss",
+		"../../Código/jorgecf.github.io/_sass/_syntax-highlighting.scss"
 	],
 	"sourcesContent": [
 		"@import \"fonts\";\n@import \"theme\";\n\n@charset \"utf-8\";\n\n.light-body {\n    // light\n    $text-color: #111111 !default;\n    $background-color: #f7f7fa !default;\n    $brand-color: #2a7ae2 !default;\n    $grey-color: #828282 !default;\n    $grey-color-light: lighten($grey-color, 40%) !default;\n    $grey-color-dark: darken($grey-color, 25%) !default;\n\n    $code-color: #fff6f2;\n    $code-background-color: #fff6f2;\n    $code-alt-color: #EFEFFF;\n    $code-alt-color2: #fafaf7;\n    $code-alt-color-darker: #d7d7e5;\n    $cat-color: #1756a9;\n\n    $aside-border-color: #e3e3e3;\n\n    @import \"./base\",\n    \"./page\",\n    \"./layout\",\n    \"./home\",\n    \"./syntax-highlighting\";\n}\n\n.dark-body {\n    // dark\n    $text-color: #EEEEEE !default;\n    $background-color: #2D2D2D !default;\n    $brand-color: #E2922A !default;\n    $grey-color: #828282 !default;\n    $grey-color-light: #2d2d2d !default;\n    $grey-color-dark: darken($grey-color, 25%) !default;\n\n    $code-color: #FFFFEF;\n    $code-background-color: #454545;\n    $code-alt-color: #3E4A52;\n    $code-alt-color2: #4c6071;\n    $code-alt-color-darker: #3E4A52;\n    $cat-color: #9CC3DB;\n\n    $aside-border-color: $code-alt-color2;\n\n    @import \"./base\",\n    \"./page\",\n    \"./layout\",\n    \"./home\",\n    \"./syntax-highlighting\";\n}",
